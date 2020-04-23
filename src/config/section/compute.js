@@ -86,7 +86,7 @@ export default {
           dataView: true,
           groupAction: true,
           show: (record) => { return ['Stopped'].includes(record.state) },
-          args: ['podid', 'clusterid', 'hostid'],
+          args: ['podid', 'clusterid', 'hostid', 'bootintobios'],
           response: (result) => { return result.virtualmachine && result.virtualmachine.password ? `Password of the VM is ${result.virtualmachine.password}` : null }
         },
         {
@@ -104,7 +104,8 @@ export default {
           icon: 'reload',
           label: 'label.action.reboot.instance',
           dataView: true,
-          show: (record) => { return ['Running'].includes(record.state) }
+          show: (record) => { return ['Running'].includes(record.state) },
+          args: ['bootintobios']
         },
         {
           api: 'restoreVirtualMachine',
