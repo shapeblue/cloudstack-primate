@@ -102,6 +102,7 @@
 "bcfdeviceid": "ID",
 "bladeid": "Blade ID",
 "bootable": "Bootable",
+"bootIntoSetup": "boot into hardware setup",
 "broadcastdomainrange": "Broadcast domain range",
 "broadcastdomaintype": "Broadcast Domain Type",
 "broadcasturi": "Broadcast URI",

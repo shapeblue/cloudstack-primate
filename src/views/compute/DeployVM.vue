@@ -276,12 +276,12 @@
                 </template>
               </a-step>
               <a-step
-                :title="this.$t('enter BIOS setup')"
+                :title="this.$t('bootIntoSetup')"
                 :status="zoneSelected ? 'process' : 'wait'">
                 <template slot="description">
                   <div v-if="zoneSelected">
                     <a-checkbox
-                      @change="event => { this.bootintobios = event.target.checked }">enter BIOS setup</a-checkbox>
+                      @change="event => { this.bootintosetup = event.target.checked }">Boot into setup</a-checkbox>
                   </div>
                 </template>
               </a-step>
@@ -430,7 +430,7 @@ export default {
         AFFINITY_GROUP: 4,
         NETWORK: 5,
         SSH_KEY_PAIR: 6,
-        ENABLE_BIOS_SETUP: 7
+        ENABLE_SETUP: 7
       },
       initDataConfig: {},
       defaultNetwork: '',
@@ -447,7 +447,7 @@ export default {
       ],
       tabKey: 'templateid',
       dataPreFill: {},
-      bootintobios: false
+      bootintosetup: false
     }
   },
   computed: {
@@ -860,9 +860,6 @@ export default {
         keypair: name
       })
     },
-    enterBiosChoiceChanged (event) {
-      this.bootintobios = event.target.checked
-    },
     getText (option) {
       return _.get(option, 'displaytext', _.get(option, 'name'))
     },
@@ -934,7 +931,7 @@ export default {
         deployVmData.name = values.name
         deployVmData.displayname = values.name
         // step 8: enter setup
-        deployVmData.bootintobios = this.bootintobios
+        deployVmData.bootintosetup = this.bootintosetup
         const title = this.$t('Launch Virtual Machine')
         const description = deployVmData.name ? deployVmData.name : values.zoneid
         this.loading.deploy = true
