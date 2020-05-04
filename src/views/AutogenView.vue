@@ -431,7 +431,7 @@ export default {
           key = Object.keys(columnKey)[0]
           customRender[key] = columnKey[key]
         }
-        var columnFilters
+        var columnFilters = null
         if (this.filters && key in this.filters && Array.isArray(this.filters[key])) {
           columnFilters = []
           this.filters[key].forEach(function (item, i) {
