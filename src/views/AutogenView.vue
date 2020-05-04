@@ -36,14 +36,6 @@
               </a-button>
             </a-tooltip>
           </breadcrumb>
-          <a-select
-            v-if="!dataView && !treeView && filterKey && filterOptions && filterOptions.length > 0"
-            :value="filterSelectedOption"
-            @change="onFilterChange">
-            <a-select-option v-for="(opt) in filterOptions" :key="opt">
-              {{ opt }}
-            </a-select-option>
-          </a-select>
         </a-col>
         <a-col :span="10">
           <span style="float: right">
@@ -326,21 +318,8 @@ export default {
   },
   beforeCreate () {
     this.form = this.$form.createForm(this)
-    var filterData = this.$route.meta.filter
-    this.filterKey = undefined
-    this.filterOptions = undefined
-    this.filterSelectedOption = undefined
-    if (filterData && Array.isArray(filterData) &&
-      filterData.length === 2 &&
-      filterData[0] && filterData[0].length > 0 &&
-      Array.isArray(filterData[1]) && filterData[1].length > 0) {
-      this.filterKey = filterData[0]
-      this.filterOptions = filterData[1]
-      if (this.filterOptions[0] !== 'All') {
-        this.filterOptions.unshift('All')
-      }
-      this.filterSelectedOption = this.filterOptions[0]
-    }
+    this.filters = this.$route.meta.filter
+    this.selectedFilters = undefined
   },
   mounted () {
     this.currentPath = this.$route.fullPath
@@ -370,7 +349,13 @@ export default {
     }
   },
   methods: {
-    fetchData () {
+    fetchData (fetchFilters = undefined) {
+      console.log('fetchData', fetchFilters)
+      if (fetchFilters && Object.keys(fetchFilters).length > 0) {
+        this.page = 1
+        this.selectedFilters = fetchFilters
+      }
+      console.log(this.selectedFilters)
       if (this.routeName !== this.$route.name) {
         this.routeName = this.$route.name
         this.items = []
@@ -446,9 +431,21 @@ export default {
           key = Object.keys(columnKey)[0]
           customRender[key] = columnKey[key]
         }
+        var columnFilters
+        if (this.filters && key in this.filters && Array.isArray(this.filters[key])) {
+          columnFilters = []
+          this.filters[key].forEach(function (item, i) {
+            if (typeof item === 'object' && 'text' in item && 'value' in item) {
+              columnFilters.push(item)
+            } else if (typeof item === 'string') {
+              columnFilters.push({ text: item, value: item })
+            }
+          })
+        }
         this.columns.push({
           title: this.$t(key),
           dataIndex: key,
+          filters: columnFilters,
           scopedSlots: { customRender: key },
           sorter: function (a, b) { return genericCompare(a[this.dataIndex] || '', b[this.dataIndex] || '') }
         })
@@ -479,8 +476,11 @@ export default {
         }
       }
 
-      if (this.filterKey && this.filterSelectedOption && this.filterSelectedOption !== 'All') {
-        params[this.filterKey] = this.filterSelectedOption
+      if (this.selectedFilters && typeof this.selectedFilters === 'object') {
+        var filters = this.selectedFilters
+        Object.keys(filters).forEach(function (key, i) {
+          params[key] = filters[key].join()
+        })
       }
 
       api(this.apiName, params).then(json => {
@@ -554,14 +554,6 @@ export default {
       }).finally(f => {
         this.loading = false
       })
-    },
-    onFilterChange (value) {
-      if (this.filterKey === undefined ||
-        this.filterKey === null ||
-        this.filterKey.length === 0 ||
-        this.filterSelectedOption === value) return
-      this.filterSelectedOption = value
-      this.fetchData()
     },
     onSearch (value) {
       this.searchQuery = value

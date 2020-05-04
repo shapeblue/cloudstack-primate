@@ -26,6 +26,7 @@
     :rowSelection="['vm', 'event', 'alert'].includes($route.name) ? {selectedRowKeys: selectedRowKeys, onChange: onSelectChange} : null"
     :rowClassName="getRowClassName"
     style="overflow-y: auto"
+    @change="handleTableChange"
   >
     <template slot="footer">
       <span v-if="hasSelected">
@@ -374,6 +375,11 @@ export default {
       data.forEach((item, index) => {
         this.handleUpdateOrder(item.id, index + 1)
       })
+    },
+    handleTableChange (pagination, filters, sorter) {
+      if (filters) {
+        this.$emit('refresh', filters)
+      }
     }
   }
 }

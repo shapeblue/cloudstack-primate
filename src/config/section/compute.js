@@ -63,7 +63,9 @@ export default {
         name: 'settings',
         component: () => import('@/components/view/DetailSettings')
       }],
-      filter: ['state', ['Running', 'Stopped', 'Destroyed']],
+      filter: {
+        state: ['Running', 'Stopped', 'Destroyed']
+      },
       actions: [
         {
           api: 'deployVirtualMachine',
