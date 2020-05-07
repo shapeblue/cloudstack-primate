@@ -27,7 +27,7 @@ export default {
       title: 'Instances',
       icon: 'desktop',
       docHelp: 'adminguide/virtual_machines.html',
-      permission: ['listVirtualMachinesMetrics', 'listVirtualMachines'],
+      permission: ['listVirtualMachinesMetrics'],
       resourceType: 'UserVm',
       columns: [
         'name', 'state', 'instancename', 'ipaddress', 'cpunumber', 'cpuused', 'cputotal',
@@ -458,14 +458,8 @@ export default {
           icon: 'plus',
           label: 'Create SSH Key Pair',
           listView: true,
-          args: ['name', 'account', 'domainid']
-        },
-        {
-          api: 'registerSSHKeyPair',
-          icon: 'key',
-          label: 'Register SSH Public Key',
-          listView: true,
-          args: ['name', 'account', 'domainid', 'publickey']
+          popup: true,
+          component: () => import('@/views/compute/CreateSSHKeyPair.vue')
         },
         {
           api: 'deleteSSHKeyPair',
