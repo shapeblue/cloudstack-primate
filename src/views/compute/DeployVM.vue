@@ -89,10 +89,9 @@
                         v-decorator="['userdata']">
                       </a-textarea>
                     </a-form-item>
-                    <a-form-item :label="this.$t('bootIntoSetup')" >
+                    <a-form-item :label="this.$t('bootintosetup')" v-if="zoneSelected && ((tabKey === 'isoid' && hypervisor === 'VMware') || (tabKey === 'templateid' && template && template.hypervisor === 'VMware'))" >
                       <a-switch
-                        @change="event => { this.bootintosetup = event.target.checked }"
-                        v-decorator="['bootIntoSetup']">
+                        v-decorator="['bootintosetup']">
                       </a-switch>
                     </a-form-item>
                   </div>
@@ -442,8 +441,7 @@ export default {
         }
       ],
       tabKey: 'templateid',
-      dataPreFill: {},
-      bootintosetup: false
+      dataPreFill: {}
     }
   },
   computed: {
@@ -927,7 +925,9 @@ export default {
         deployVmData.name = values.name
         deployVmData.displayname = values.name
         // step 8: enter setup
-        deployVmData.bootintosetup = this.bootintosetup
+        if ('bootintosetup' in values) {
+          deployVmData.bootintosetup = values.bootintosetup
+        }
         const title = this.$t('Launch Virtual Machine')
         const description = deployVmData.name ? deployVmData.name : values.zoneid
         this.loading.deploy = true

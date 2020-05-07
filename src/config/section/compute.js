@@ -86,7 +86,7 @@ export default {
           dataView: true,
           groupAction: true,
           show: (record) => { return ['Stopped'].includes(record.state) },
-          args: ['podid', 'clusterid', 'hostid', 'bootintosetup'],
+          args: (record) => { return record.hypervisor === 'VMware' ? ['podid', 'clusterid', 'hostid', 'bootintosetup'] : ['podid', 'clusterid', 'hostid'] },
           response: (result) => { return result.virtualmachine && result.virtualmachine.password ? `Password of the VM is ${result.virtualmachine.password}` : null }
         },
         {
@@ -105,7 +105,7 @@ export default {
           label: 'label.action.reboot.instance',
           dataView: true,
           show: (record) => { return ['Running'].includes(record.state) },
-          args: ['bootintosetup']
+          args: (record) => { return record.hypervisor === 'VMware' ? ['bootintosetup'] : [] }
         },
         {
           api: 'restoreVirtualMachine',
