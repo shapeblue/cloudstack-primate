@@ -185,8 +185,8 @@ export default {
       }
       if (!(apiName in this.$store.getters.apis)) {
         this.$notification.error({
-          message: 'Failed to execute API: ' + apiName,
-          description: 'User is not permitted to use the API'
+          message: this.$t('error.execute.api.failed') + ' ' + apiName,
+          description: this.$t('message.user.not.permitted.api')
         })
         return
       }
@@ -221,7 +221,7 @@ export default {
     },
     addDetail () {
       if (this.newKey === '' || this.newValue === '') {
-        this.error = 'Must provide a valid key and value for setting'
+        this.error = this.$t('message.error.provide.setting')
         return
       }
       this.error = false
