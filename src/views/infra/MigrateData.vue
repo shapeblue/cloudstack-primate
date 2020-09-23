@@ -154,8 +154,10 @@ export default {
           this.closeAction()
         }).catch(error => {
           console.log(error)
+        }).finally(() => {
+          this.loading = false
+          this.closeAction()
         })
-        this.loading = false
       })
     },
     migrateData (args, title) {
