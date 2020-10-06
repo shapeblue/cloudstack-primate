@@ -170,6 +170,7 @@
                   }]"
                   v-model="formModel[field.name]"
                   :placeholder="field.description"
+                  :autoFocus="fieldIndex === 0"
                 />
               </span>
               <span v-else-if="currentAction.mapping && field.name in currentAction.mapping && currentAction.mapping[field.name].options">
@@ -402,7 +403,12 @@ export default {
         this.fetchData()
       }
     })
-    eventBus.$on('async-job-complete', () => {
+    eventBus.$on('async-job-complete', (action) => {
+      if (this.$route.path.includes('/vm/')) {
+        if (action && 'api' in action && ['destroyVirtualMachine'].includes(action.api)) {
+          return
+        }
+      }
       this.fetchData()
     })
     eventBus.$on('exec-action', (action, isGroupAction) => {
@@ -986,7 +992,7 @@ export default {
         this.actionLoading = true
         api(action.api, params).then(json => {
           hasJobId = this.handleResponse(json, resourceName, action)
-          if ((action.icon === 'delete' || ['archiveEvents', 'archiveAlerts'].includes(action.api)) && this.dataView) {
+          if ((action.icon === 'delete' || ['archiveEvents', 'archiveAlerts', 'unmanageVirtualMachine'].includes(action.api)) && this.dataView) {
             this.$router.go(-1)
           } else {
             if (!hasJobId) {
