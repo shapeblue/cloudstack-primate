@@ -31,12 +31,10 @@
                 }]
             }]"
             :loading="loading"
-            @change="val => { selectedStore = val }"
-          >
+            @change="val => { selectedStore = val }">
             <a-select-option
               v-for="store in imageStores"
-              :key="store.id"
-            >{{ store.name || opt.url }}</a-select-option>
+              :key="store.id">{{ store.name || opt.url }}</a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item
@@ -50,13 +48,11 @@
                 }]
             }]"
             mode="multiple"
-            :loading="loading"
-          >
+            :loading="loading">
             <a-select-option
               v-for="store in imageStores"
               v-if="store.id !== selectedStore"
-              :key="store.id"
-            >{{ store.name || opt.url }}</a-select-option>
+              :key="store.id">{{ store.name || opt.url }}</a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item :label="$t('migrationPolicy')">
@@ -69,8 +65,7 @@
                   message: $t('message.select.migration.policy'),
                 }]
             }]"
-            :loading="loading"
-          >
+            :loading="loading">
             <a-select-option value="Complete">{{ $t('label.complete') }}</a-select-option>
             <a-select-option value="Balance">{{ $t('label.balance') }}</a-select-option>
           </a-select>
@@ -154,10 +149,12 @@ export default {
           this.closeAction()
         }).catch(error => {
           console.log(error)
-        }).finally(() => {
+        })
+        setTimeout(() => {
+          this.$message.loading({ content: this.$t('label.migrating.data'), duration: 1 })
           this.loading = false
           this.closeAction()
-        })
+        }, 200)
       })
     },
     migrateData (args, title) {
@@ -165,6 +162,13 @@ export default {
         api('migrateSecondaryStorageData', args).then(async json => {
           const jobId = json.migratesecondarystoragedataresponse.jobid
           if (jobId) {
+            this.$store.dispatch('AddAsyncJob', {
+              title: title,
+              jobid: jobId,
+              description: this.$t('message.data.migration.progress'),
+              status: 'progress',
+              silent: true
+            })
             const result = await this.pollJob(jobId, title)
             if (result.jobstatus === 2) {
               reject(result.jobresult.errortext)
@@ -185,13 +189,6 @@ export default {
             if (result.jobstatus === 0) {
               return
             }
-            this.$store.dispatch('AddAsyncJob', {
-              title: title,
-              jobid: jobId,
-              description: 'imagestore',
-              status: 'progress',
-              silent: true
-            })
             clearInterval(asyncJobInterval)
             resolve(result)
           })
