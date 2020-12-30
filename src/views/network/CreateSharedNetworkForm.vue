@@ -809,13 +809,27 @@ export default {
         if (hideipaddressusage) {
           params.hideipaddressusage = true
         }
+        const title = this.$t('label.create.network')
+        const description = this.$t('message.success.add.guest.network')
         api('createNetwork', params).then(json => {
-          this.$notification.success({
-            message: this.$t('label.network'),
-            description: this.$t('message.success.add.guest.network')
-          })
-          this.resetForm()
-          this.$emit('refresh-data')
+          const jobId = json.createnetworkresponse.jobid
+          if (jobId) {
+            this.$pollJob({
+              jobId,
+              successMethod: result => {
+                this.$store.dispatch('AddAsyncJob', {
+                  title: title,
+                  jobid: jobId,
+                  description: description,
+                  status: this.$t('progress')
+                })
+              },
+              loadingMessage: `${title} ${this.$t('label.in.progress')}`,
+              catchMessage: this.$t('error.fetching.async.job.result')
+            })
+            this.resetForm()
+            this.$emit('refresh-data')
+          }
           this.closeAction()
         }).catch(error => {
           this.$notifyError(error)

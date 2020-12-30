@@ -490,12 +490,26 @@ export default {
             params.account = values.account
           }
         }
+        const title = this.$t('label.create.network')
+        const description = this.$t('message.success.create.isolated.network')
         api('createNetwork', params).then(json => {
-          this.$notification.success({
-            message: 'Network',
-            description: this.$t('message.success.create.isolated.network')
-          })
-          this.$emit('refresh-data')
+          const jobId = json.createnetworkresponse.jobid
+          if (jobId) {
+            this.$pollJob({
+              jobId,
+              successMethod: result => {
+                this.$store.dispatch('AddAsyncJob', {
+                  title: title,
+                  jobid: jobId,
+                  description: description,
+                  status: this.$t('progress')
+                })
+              },
+              loadingMessage: `${title} ${this.$t('label.in.progress')}`,
+              catchMessage: this.$t('error.fetching.async.job.result')
+            })
+            this.$emit('refresh-data')
+          }
           this.closeAction()
         }).catch(error => {
           this.$notifyError(error)
